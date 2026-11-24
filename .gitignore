@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Per-run model files are large in number; only the best models in models/ are kept.
+logs/**/policy.pt
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.pytest_cache/
