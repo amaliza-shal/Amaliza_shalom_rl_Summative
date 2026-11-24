@@ -12,3 +12,5 @@ logs/**/policy.pt
 Thumbs.db
 .vscode/
 .pytest_cache/
+logs/*.txt
+logs/**/*.txt

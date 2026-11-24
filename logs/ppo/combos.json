@@ -1,0 +1,21 @@
+[
+  {
+    "run": 11,
+    "run_id": "ppo_run11",
+    "overrides": {
+      "epochs": 10,
+      "entropy_coef": 0.0,
+      "lr": 0.001
+    },
+    "label": "epochs per update 10 + entropy weight 0 + learning rate 1e-3"
+  },
+  {
+    "run": 12,
+    "run_id": "ppo_run12",
+    "overrides": {
+      "epochs": 10,
+      "entropy_coef": 0.0
+    },
+    "label": "epochs per update 10 + entropy weight 0"
+  }
+]

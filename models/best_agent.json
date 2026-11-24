@@ -1,0 +1,11 @@
+{
+  "algo": "ppo",
+  "best_on_average": "PPO",
+  "unseen_reward": 21.16,
+  "runner_up": "DQN",
+  "gap": 1.77,
+  "larger_seed_std": 1.96,
+  "gap_vs_seed_std": "no clear winner (gap < 1 std across seeds)",
+  "seed_model_pairs_won": "8/9",
+  "most_robust_hard_world": "PPO"
+}

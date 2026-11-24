@@ -1,0 +1,7 @@
+agent,best_run,mean_reward_3_seeds,std_3_seeds,steps_to_80,finished_strong,unseen_reward,unseen_std,hard_reward
+Random,-,-4.18,-,-,0.077,-1.97,-,-2.51
+Rule-based,-,12.94,-,-,0.507,13.16,-,5.73
+DQN,4,19.32,1.89,56773,0.672,19.39,1.96,9.72
+REINFORCE,7,18.77,0.89,58793,0.65,18.86,0.56,11.79
+PPO,9,21.29,0.7,48810,0.776,21.16,0.39,13.29
+A2C,9,17.75,0.74,28501,0.594,17.86,0.69,11.53

@@ -1,0 +1,13 @@
+run,changed,value,lr,gamma,entropy_coef,value_coef,rollout,hidden,mean_reward,std_reward,steps_to_80,finished_strong,train_time_s,run_id,best
+1,baseline,-,0.001,0.99,0.01,0.5,128,128,15.55,6.52,20608,0.52,418.2,a2c_run01,
+2,learning rate,3e-4,0.0003,0.99,0.01,0.5,128,128,16.54,6.76,30848,0.563,429.3,a2c_run02,
+3,learning rate,3e-3,0.003,0.99,0.01,0.5,128,128,16.15,4.88,100096,0.557,418.7,a2c_run03,
+4,gamma,0.95,0.001,0.95,0.01,0.5,128,128,15.82,5.18,35968,0.547,418.7,a2c_run04,
+5,entropy weight,0,0.001,0.99,0.0,0.5,128,128,17.12,4.94,20608,0.583,312.5,a2c_run05,
+6,entropy weight,0.05,0.001,0.99,0.05,0.5,128,128,15.96,4.62,15488,0.54,419.1,a2c_run06,
+7,value loss weight,0.25,0.001,0.99,0.01,0.25,128,128,15.91,6.5,20608,0.54,427.1,a2c_run07,
+8,value loss weight,1.0,0.001,0.99,0.01,1.0,128,128,14.8,7.5,20608,0.527,408.6,a2c_run08,
+9,rollout length,32,0.001,0.99,0.01,0.5,32,128,17.49,4.87,30176,0.563,422.3,a2c_run09,BEST
+10,rollout length,256,0.001,0.99,0.01,0.5,256,128,16.25,5.14,30976,0.513,381.7,a2c_run10,
+11,combo,rollout length 32 + entropy weight 0 + learning rate 3e-4 + value loss weight 0.25 + gamma 0.95,0.0003,0.95,0.0,0.25,32,128,15.8,5.36,75392,0.51,440.2,a2c_run11,
+12,combo,rollout length 32 + entropy weight 0,0.001,0.99,0.0,0.5,32,128,18.02,5.1,55296,0.6,433.9,a2c_run12,

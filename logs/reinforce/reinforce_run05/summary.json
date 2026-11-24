@@ -1,0 +1,22 @@
+{
+  "total_steps": 100000,
+  "seed": 0,
+  "max_grad_norm": 0.5,
+  "lr": 0.001,
+  "gamma": 0.99,
+  "entropy_coef": 0.0,
+  "episodes_per_update": 8,
+  "normalize_advantage": true,
+  "hidden": 128,
+  "algo": "reinforce",
+  "mean_reward": 17.84371,
+  "std_reward": 5.239548418031845,
+  "finished_strong_share": 0.61,
+  "mean_dropouts": 0.02,
+  "full_episodes": 0.98,
+  "eval_mode": "sample",
+  "greedy_mean_reward": 11.255615999999998,
+  "steps_to_80": 66056,
+  "train_time_s": 209.7,
+  "best_val_reward": 18.30406
+}

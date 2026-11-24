@@ -1,0 +1,7 @@
+setting,spread,best_value
+entropy weight,2.67,0
+learning rate,2.02,1e-3
+epochs per update,1.92,10
+rollout length,0.91,512
+clip range,0.67,0.1
+GAE lambda,0.64,0.90

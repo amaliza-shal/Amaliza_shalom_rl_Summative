@@ -1,0 +1,6 @@
+setting,spread,best_value
+rollout length,1.94,32
+entropy weight,1.57,0
+value loss weight,1.11,0.25
+learning rate,0.99,3e-4
+gamma,0.27,0.95

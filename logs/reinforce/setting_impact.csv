@@ -1,0 +1,7 @@
+setting,spread,best_value
+advantage normalisation,4.35,off
+episodes per update,1.58,4
+learning rate,1.23,3e-3
+entropy weight,0.96,0
+gamma,0.6,0.95
+network size,0.56,256 x 256

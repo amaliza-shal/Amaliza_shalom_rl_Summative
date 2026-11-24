@@ -1,0 +1,16 @@
+{
+  "lr": 0.001,
+  "gamma": 0.99,
+  "batch_size": 64,
+  "buffer_size": 10000,
+  "eps_decay_steps": 30000,
+  "eps_start": 1.0,
+  "eps_end": 0.05,
+  "tau": 0.005,
+  "hidden": 128,
+  "frames_per_batch": 16,
+  "updates_per_batch": 8,
+  "warmup_steps": 1000,
+  "total_steps": 100000,
+  "seed": 0
+}

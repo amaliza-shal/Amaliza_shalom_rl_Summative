@@ -1,0 +1,23 @@
+[
+  {
+    "run": 11,
+    "run_id": "a2c_run11",
+    "overrides": {
+      "rollout": 32,
+      "entropy_coef": 0.0,
+      "lr": 0.0003,
+      "value_coef": 0.25,
+      "gamma": 0.95
+    },
+    "label": "rollout length 32 + entropy weight 0 + learning rate 3e-4 + value loss weight 0.25 + gamma 0.95"
+  },
+  {
+    "run": 12,
+    "run_id": "a2c_run12",
+    "overrides": {
+      "rollout": 32,
+      "entropy_coef": 0.0
+    },
+    "label": "rollout length 32 + entropy weight 0"
+  }
+]

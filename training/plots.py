@@ -65,10 +65,12 @@ def band(ax, grid, curves, colour, label):
 
 
 def save(fig, name, caption):
-    fig.text(0.01, 0.005, caption, fontsize=8.5, color=MUTED, ha="left", va="bottom", wrap=True)
+    """Save a figure. The caption is printed (the report and README carry it under the image),
+    not drawn on the figure, so it can never collide with the axes."""
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
     fig.savefig(os.path.join(OUT, name), dpi=160, bbox_inches="tight")
     plt.close(fig)
-    print(f"  saved assets/{name}")
+    print(f"  saved assets/{name}  ({caption})")
 
 
 # ---------------------------------------------------------------------------
@@ -112,10 +114,10 @@ def steps_to_episodes(algo, seed, step):
 # ---------------------------------------------------------------------------
 
 def fig1_rewards(base):
-    fig, axes = plt.subplots(1, 4, figsize=(15, 3.8), sharey=True)
+    fig, axes = plt.subplots(2, 2, figsize=(11, 7), sharey=True)
     rnd = base["random"]["eval"]["reward"].mean()
     rule = base["rule_based"]["eval"]["reward"].mean()
-    for ax, algo in zip(axes, ALGOS):
+    for ax, algo in zip(axes.flat, ALGOS):
         grid = np.linspace(2_000, 100_000, 200)
         curves = [on_grid(df, "step", "episode_reward", grid, 100)
                   for s in SEEDS if (df := read(algo, s, "episodes")) is not None]
@@ -126,8 +128,9 @@ def fig1_rewards(base):
         ax.set_title(LABEL[algo])
         ax.set_xlabel("Environment steps")
         ax.xaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v/1000:.0f}k"))
-        ax.legend(fontsize=8, loc="lower right")
-    axes[0].set_ylabel("Episode reward (sum over 18 terms)")
+        ax.legend(fontsize=8, loc="center right")
+    for ax in axes[:, 0]:
+        ax.set_ylabel("Episode reward (sum over 18 terms)")
     fig.suptitle("Figure 1. Cumulative reward per episode during training", x=0.01, ha="left", fontweight="bold")
     save(fig, "fig1_cumulative_rewards.png",
          "Rolling mean of 100 training episodes; band = +/-1 std across seeds 0-2 (best config of each algorithm). "
@@ -206,7 +209,6 @@ def fig4_convergence():
     ax.grid(axis="x", visible=False)
     fig.suptitle("Figure 4. Convergence: when each method reaches and holds 80% of its best validation reward",
                  x=0.01, ha="left", fontweight="bold")
-    fig.tight_layout(rect=(0, 0.03, 1, 1))
     save(fig, "fig4_convergence.png",
          "Top: validation reward every 5,000 steps (lighter = seed 0, darker = seed 2); dot = first point after which the "
          "curve stays above start + 80% of (best - start). Bottom: the same point in training episodes.")
@@ -232,7 +234,7 @@ def fig5_generalization(gen, base):
                      "standard_strong": u["finished_strong_share"], "hard_reward": h["mean_reward"], "hard_std": 0,
                      "hard_strong": h["finished_strong_share"]})
     t = pd.DataFrame(rows)
-    fig, axes = plt.subplots(1, 2, figsize=(13, 4))
+    fig, axes = plt.subplots(1, 2, figsize=(14, 4.6))
     colours = [COLOUR.get(k, "#a9a79f" if k == "rule_based" else "#d6d4cc") for k in t["key"]]
     x = np.arange(len(t))
     for ax, metric, title, fmt in [(axes[0], "reward", "Mean episode reward", "{:+.1f}"),
@@ -244,13 +246,17 @@ def fig5_generalization(gen, base):
             ax.bar(x + (k - 0.5) * w, vals, width=w - 0.03, color=colours, alpha=alpha, yerr=err,
                    error_kw={"ecolor": MUTED, "elinewidth": 1, "capsize": 3}, edgecolor="#fcfcfb", linewidth=2,
                    label="100 unseen seeds, standard world" if scen == "standard" else "Harder world")
-            for xi, v in zip(x + (k - 0.5) * w, vals):
-                ax.text(xi, v if v >= 0 else 0, fmt.format(v), ha="center", va="bottom", fontsize=7.5, color=INK)
-        ax.set_xticks(x, t["agent"])
+            tops = vals + (err if err is not None else 0)
+            pad = 0.4 if metric == "reward" else 0.01
+            for xi, v, top in zip(x + (k - 0.5) * w, vals, tops):
+                ax.text(xi, max(top, 0) + pad, fmt.format(v), ha="center", va="bottom", fontsize=7.5, color=INK)
+        ax.set_xticks(x, t["agent"], fontsize=9)
         ax.set_title(title)
+        lo, hi = ax.get_ylim()
+        ax.set_ylim(lo, hi * 1.18)
         ax.axhline(0, color="#bdbbb4", linewidth=1)
         ax.grid(axis="x", visible=False)
-    axes[0].legend(fontsize=8, loc="upper right")
+    axes[0].legend(fontsize=8, loc="upper right", ncol=2)
     fig.suptitle("Figure 5. Generalization: unseen starting states and a harder world", x=0.01, ha="left",
                  fontweight="bold")
     save(fig, "fig5_generalization.png",
@@ -274,9 +280,10 @@ def fig6_sweeps():
         labels = [f"{r.run}. {r.changed} {r.value}" if r.changed != "baseline" else "1. baseline"
                   for r in df.itertuples()]
         y = np.arange(len(df))[::-1]
-        ax.barh(y, df["mean_reward"], color=COLOUR[algo],
-                alpha=[1.0 if b == "BEST" else 0.5 for b in df["best"].fillna("")], height=0.7,
-                edgecolor="#fcfcfb", linewidth=2)
+        bars = ax.barh(y, df["mean_reward"], color=COLOUR[algo], height=0.7,
+                       edgecolor="#fcfcfb", linewidth=2)
+        for bar, b in zip(bars, df["best"].fillna("")):
+            bar.set_alpha(1.0 if b == "BEST" else 0.5)
         ax.errorbar(df["mean_reward"], y, xerr=df["std_reward"] / np.sqrt(50), fmt="none", ecolor=MUTED,
                     elinewidth=1, capsize=2)
         ax.set_yticks(y, labels, fontsize=7.5)
@@ -285,7 +292,6 @@ def fig6_sweeps():
         ax.grid(axis="y", visible=False)
     fig.suptitle("Figure 6. Hyperparameter sweeps: every run, same environment, same 100k-step budget",
                  x=0.01, ha="left", fontweight="bold")
-    fig.tight_layout(rect=(0, 0.03, 1, 1))
     save(fig, "fig6_sweeps.png", "One training seed per sweep run; the best run was re-trained with seeds 0-2.")
 
 
@@ -313,12 +319,12 @@ def leaderboard(base, gen, conv):
         m = [x["mean_reward"] for x in sums]
         g = gen[algo]
         rows.append({"agent": LABEL[algo], "best_run": best_run, "mean_reward_3_seeds": round(np.mean(m), 2),
-                     "std_3_seeds": round(np.std(m), 2),
+                     "std_3_seeds": round(float(np.std(m, ddof=1)), 2),
                      "steps_to_80": int(np.mean([steps_to_80_for_run(os.path.dirname(run_path(algo, s, "x")))
                                                  for s in SEEDS if os.path.exists(run_path(algo, s, "summary.json"))])),
                      "finished_strong": round(np.mean([x["finished_strong_share"] for x in sums]), 3),
                      "unseen_reward": round(g["unseen_reward"].mean(), 2),
-                     "unseen_std": round(g["unseen_reward"].std(ddof=0), 2),
+                     "unseen_std": round(g["unseen_reward"].std(ddof=1), 2),
                      "hard_reward": round(g["hard_reward"].mean(), 2)})
     lb = pd.DataFrame(rows)
     lb.to_csv(os.path.join(RES, "leaderboard.csv"), index=False)
@@ -330,7 +336,13 @@ def leaderboard(base, gen, conv):
     rl = rl.sort_values("unseen_reward", ascending=False)
     first, second = rl.iloc[0], rl.iloc[1]
     gap = first["unseen_reward"] - second["unseen_reward"]
-    clear = gap >= float(first["unseen_std"])
+    # Clear only if the gap is larger than the seed-to-seed spread of BOTH leaders.
+    spread = max(float(first["unseen_std"]), float(second["unseen_std"]))
+    clear = gap >= spread
+    gs = {a: gen[a]["unseen_reward"].tolist() for a in ALGOS}
+    k1 = {LABEL[a]: a for a in ALGOS}
+    a1, a2 = k1[first["agent"]], k1[second["agent"]]
+    seed_wins = sum(x > y for x in gs[a1] for y in gs[a2])
     robust = rl.sort_values("hard_reward", ascending=False).iloc[0]
     key = {LABEL[a]: a for a in ALGOS}
     verdict = {
@@ -339,7 +351,9 @@ def leaderboard(base, gen, conv):
         "unseen_reward": float(first["unseen_reward"]),
         "runner_up": second["agent"],
         "gap": round(float(gap), 3),
+        "larger_seed_std": round(spread, 3),
         "gap_vs_seed_std": "clear winner" if clear else "no clear winner (gap < 1 std across seeds)",
+        "seed_model_pairs_won": f"{seed_wins}/{len(gs[a1]) * len(gs[a2])}",
         "most_robust_hard_world": robust["agent"],
     }
     with open("models/best_agent.json", "w") as f:
@@ -356,6 +370,8 @@ def main():
     base = baseline_scores()
     print("Generalization tests (3 seeds x 100 unseen + 100 hard) ...")
     gen = {a: agent_generalization(a) for a in ALGOS}
+    pd.concat([g.assign(algo=a) for a, g in gen.items()]).round(3).to_csv(
+        os.path.join(RES, "generalization_per_seed.csv"), index=False)
     print("Figures ...")
     fig1_rewards(base)
     fig2_dqn_loss()

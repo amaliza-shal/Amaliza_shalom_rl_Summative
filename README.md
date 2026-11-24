@@ -158,6 +158,35 @@ policy-gradient agents are also logged (`greedy_mean_reward` in each `summary.js
 
 ---
 
+## Results
+
+Each algorithm ran 12 configurations (10 single changes + 2 combinations, one
+training seed each). The best configuration was re-trained with seeds 0, 1 and 2.
+Full tables: `logs/{dqn,reinforce,ppo,a2c}/sweep_results.md`, `logs/results/`.
+
+| Agent | Best run | Mean reward (50 eval seeds, 3 training seeds) | Finish strong | 100 unseen seeds | Harder world |
+|---|---|---|---|---|---|
+| Random | - | -4.18 | 8% | -1.97 | -2.51 |
+| Rule-based | - | 12.94 | 51% | 13.16 | 5.73 |
+| DQN | 4 (gamma 0.95) | 19.32 ± 1.89 | 67% | 19.39 ± 1.96 | 9.72 |
+| REINFORCE | 7 (4 episodes / update) | 18.77 ± 0.89 | 65% | 18.86 ± 0.56 | 11.79 |
+| **PPO** | **9 (10 epochs / update)** | **21.29 ± 0.70** | **78%** | **21.16 ± 0.39** | **13.29** |
+| A2C | 9 (32-step rollouts) | 17.75 ± 0.74 | 59% | 17.86 ± 0.69 | 11.53 |
+
+**PPO is the best agent on average and the most robust.** All three PPO models
+beat every other model in the harder world. In the normal world its lead over DQN
+(1.77) is smaller than DQN's seed-to-seed spread, so there it is ahead but not
+decisively. A2C converges fastest (about 28,500 steps to 80% of its best), but to
+the lowest score. `uv run main.py` plays the best agent (`models/best_agent.json`).
+
+| | |
+|---|---|
+| ![Cumulative reward](assets/fig1_cumulative_rewards.png) | ![Generalization](assets/fig5_generalization.png) |
+| ![DQN loss](assets/fig2_dqn_loss.png) | ![Policy entropy](assets/fig3_policy_entropy.png) |
+| ![Convergence](assets/fig4_convergence.png) | ![All sweep runs](assets/fig6_sweeps.png) |
+
+---
+
 ## Integration: JSON in, action out
 
 ```python
@@ -204,6 +233,7 @@ project_root/
 │   └── predict.py          # predict(state_json) -> action name
 │
 ├── models/
+│   ├── best_agent.json     # which algorithm won (read by main.py and predict.py)
 │   ├── dqn/                # best DQN policy
 │   └── pg/                 # best REINFORCE, PPO and A2C policies
 │
