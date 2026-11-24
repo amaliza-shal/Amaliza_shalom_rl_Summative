@@ -251,3 +251,31 @@ class SchoolRenderer:
         if self.mode == "human":
             self.pg.display.quit()
         self.pg.quit()
+
+
+# ---------------------------------------------------------------------------
+# 3D replay (three.js / WebGL)
+# ---------------------------------------------------------------------------
+
+def export_3d_replay(record: dict, out_path: str, open_browser: bool = True) -> str:
+    """Write a self-contained three.js (WebGL) replay of one episode.
+
+    `record` is the episode log written by main.py: per-term state (from
+    SchoolEnv.get_state()), action, reward and events. The page reads only that
+    JSON - the same serialization path a web or mobile front-end would use.
+    """
+    import json
+    import os
+    import webbrowser
+
+    template = os.path.join(os.path.dirname(os.path.abspath(__file__)), "viewer3d.html")
+    with open(template, encoding="utf-8") as f:
+        html = f.read()
+    data = json.dumps(record).replace("</", "<\/")
+    html = html.replace("/*EPISODE_JSON*/null", data)
+    os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write(html)
+    if open_browser:
+        webbrowser.open("file://" + os.path.abspath(out_path))
+    return out_path

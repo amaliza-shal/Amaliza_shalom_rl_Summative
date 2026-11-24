@@ -8,6 +8,7 @@ one-line-per-term terminal log. This is the project's play script.
   uv run main.py --algo rule                # the rule-based baseline
   uv run main.py --algo ppo --scenario hard # the harder world
   uv run main.py --algo ppo --gif assets/demo.gif --no-window
+  uv run main.py --algo dqn --view3d        # also open a three.js 3D replay in the browser
 
 Every episode is saved as JSON in logs/episodes/.
 """
@@ -65,7 +66,7 @@ def on_track(env) -> int:
 
 
 def play(algo="best", seed=0, delay=1.5, scenario="standard", window=True, gif=None,
-         episodes=1, log=True):
+         episodes=1, log=True, view3d=False):
     name, act = make_actor(algo)
     render_mode = "human" if window else ("rgb_array" if gif else None)
     env = SchoolEnv(render_mode=render_mode, scenario=scenario)
@@ -109,6 +110,10 @@ def play(algo="best", seed=0, delay=1.5, scenario="standard", window=True, gif=N
             with open(path, "w") as f:
                 json.dump(record, f, indent=1)
             print(f"Episode saved to {path}")
+        if view3d:
+            from environment.rendering import export_3d_replay
+            html = export_3d_replay(record, f"logs/episodes/{name.lower()}_seed{ep_seed}_{scenario}_3d.html")
+            print(f"3D replay (three.js) opened in your browser: {html}")
         wait(env, 2 * delay, window)
     if gif and frames and frames[0] is not None:
         import imageio
@@ -127,9 +132,10 @@ def main():
     p.add_argument("--episodes", type=int, default=1)
     p.add_argument("--no-window", action="store_true", help="no GUI (terminal only)")
     p.add_argument("--gif", default=None, help="save the episode as a GIF")
+    p.add_argument("--view3d", action="store_true", help="open a three.js 3D replay in the browser")
     a = p.parse_args()
     play(a.algo, a.seed, a.delay if not a.no_window else 0.0, a.scenario,
-         window=not a.no_window, gif=a.gif, episodes=a.episodes)
+         window=not a.no_window, gif=a.gif, episodes=a.episodes, view3d=a.view3d)
 
 
 if __name__ == "__main__":

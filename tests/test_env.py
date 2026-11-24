@@ -123,3 +123,13 @@ def test_reward_ordering_plan_beats_rule_beats_random():
     rule = evaluate(RuleBasedAgent())["reward"].mean()
     rand = evaluate(RandomAgent(seed=0))["reward"].mean()
     assert plan > rule > rand
+
+
+def test_3d_replay_export(tmp_path):
+    from environment.rendering import export_3d_replay
+    from main import play
+    record = play("rule", seed=4, delay=0, window=False, log=False)[0]
+    out = export_3d_replay(record, str(tmp_path / "replay.html"), open_browser=False)
+    html = open(out, encoding="utf-8").read()
+    assert "/*EPISODE_JSON*/null" not in html
+    assert '"agent": "rule-based"' in html and "three@0.160.0" in html

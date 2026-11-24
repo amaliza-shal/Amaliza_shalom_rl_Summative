@@ -13,7 +13,9 @@ learning well (learning ≥ 0.65) and confident (confidence ≥ 0.55). We call t
 Four agents are trained with **TorchRL** on the same environment and compared:
 DQN (value-based), REINFORCE, PPO and A2C (policy gradient).
 
-![Environment](assets/env_mid.png)
+| Pygame (live GUI) | three.js / WebGL (3D replay) |
+|---|---|
+| ![Pygame view](assets/env_mid.png) | ![3D view](assets/env_3d.png) |
 
 ---
 
@@ -37,7 +39,14 @@ uv run main.py --algo dqn --seed 7 --delay 3 # slower, another starting state
 uv run main.py --algo rule                   # rule-based baseline
 uv run main.py --algo ppo --scenario hard    # the harder world
 uv run main.py --no-window                   # best agent, terminal only
+uv run main.py --algo dqn --view3d           # also open a three.js 3D replay in the browser
 ```
+
+**Two views of the same environment.** The Pygame window (`environment/rendering.py`)
+runs live while the agent plays. The 3D view (`environment/viewer3d.html`, three.js /
+WebGL) replays the saved episode JSON in the browser: a 3D school with one figure
+per teacher, the six children coloured green / yellow / red by how they are doing,
+dropouts walking away, a rotatable camera and play / pause / step controls.
 
 Options: `--algo {best,dqn,reinforce,ppo,a2c,rule,random}`, `--seed`, `--delay`
 (seconds per term), `--scenario {standard,hard}`, `--episodes`, `--gif <path>`.
@@ -181,7 +190,8 @@ project_root/
 ├── environment/
 │   ├── __init__.py
 │   ├── custom_env.py       # SchoolEnv (Gymnasium API)
-│   └── rendering.py        # Pygame view
+│   ├── rendering.py        # Pygame view + three.js replay export
+│   └── viewer3d.html       # three.js (WebGL) 3D replay page
 │
 ├── training/
 │   ├── __init__.py
