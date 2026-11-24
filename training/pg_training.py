@@ -103,12 +103,20 @@ def _train_actor_critic(algo: str, cfg: dict, run_id: str, verbose: bool) -> dic
             else:
                 parts = [torch.arange(n)]
             for idx in parts:
-                out = loss_fn(flat[idx])
-                loss = out["loss_objective"] + out["loss_critic"] + out["loss_entropy"]
+                td = flat[idx]
+                out = loss_fn(td)
+                # With entropy weight 0, TorchRL leaves out the entropy terms.
+                loss = out["loss_objective"] + out["loss_critic"]
+                if "loss_entropy" in out.keys():
+                    loss = loss + out["loss_entropy"]
                 _step(optim, params, loss, cfg["max_grad_norm"])
                 logs["loss_objective"].append(out["loss_objective"].item())
                 logs["loss_critic"].append(out["loss_critic"].item())
-                logs["entropy"].append(out["entropy"].mean().item())
+                if "entropy" in out.keys():
+                    logs["entropy"].append(out["entropy"].mean().item())
+                else:
+                    with torch.no_grad():
+                        logs["entropy"].append(actor.get_dist(td).entropy().mean().item())
         logger.write("train", {
             "step": steps,
             "loss": round(sum(logs["loss_objective"]) / len(logs["loss_objective"]), 6),

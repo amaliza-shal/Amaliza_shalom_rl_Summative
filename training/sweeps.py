@@ -26,6 +26,8 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 import numpy as np
 import pandas as pd
 
+from training.common import steps_to_80_for_run
+
 ALGOS = ["dqn", "reinforce", "ppo", "a2c"]
 SEEDS = [0, 1, 2]
 
@@ -154,6 +156,7 @@ def build_table(algo) -> pd.DataFrame:
         if not is_done(algo, run_id):
             continue
         s = load_summary(algo, run_id)
+        s["steps_to_80"] = steps_to_80_for_run(run_dir(algo, run_id))
         row = {"run": num, "changed": setting, "value": value}
         for p in TABLE_PARAMS[algo]:
             row[p] = s[p]

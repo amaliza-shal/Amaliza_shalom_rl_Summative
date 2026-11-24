@@ -20,7 +20,8 @@ import numpy as np
 import pandas as pd
 
 from training.baselines import RandomAgent, RuleBasedAgent, evaluate as eval_baseline
-from training.common import EVAL_SEEDS, UNSEEN_SEEDS, evaluate_net, load_policy, summarise_eval
+from training.common import (EVAL_SEEDS, UNSEEN_SEEDS, evaluate_net, load_policy, steps_to_80_for_run,
+                             summarise_eval)
 
 ALGOS = ["dqn", "reinforce", "ppo", "a2c"]
 LABEL = {"dqn": "DQN", "reinforce": "REINFORCE", "ppo": "PPO", "a2c": "A2C",
@@ -178,8 +179,7 @@ def fig4_convergence():
             if v is None:
                 continue
             ax.plot(v["step"], v["mean_reward"], color=COLOUR[algo], alpha=0.45 + 0.25 * s, linewidth=1.6)
-            with open(run_path(algo, s, "summary.json")) as f:
-                st = json.load(f)["steps_to_80"]
+            st = steps_to_80_for_run(os.path.dirname(run_path(algo, s, "x")))
             y = np.interp(st, v["step"], v["mean_reward"])
             ax.plot(st, y, marker="o", markersize=8, color=COLOUR[algo], markeredgecolor="#fcfcfb",
                     markeredgewidth=2, zorder=5)
@@ -314,7 +314,8 @@ def leaderboard(base, gen, conv):
         g = gen[algo]
         rows.append({"agent": LABEL[algo], "best_run": best_run, "mean_reward_3_seeds": round(np.mean(m), 2),
                      "std_3_seeds": round(np.std(m), 2),
-                     "steps_to_80": int(np.mean([x["steps_to_80"] for x in sums])),
+                     "steps_to_80": int(np.mean([steps_to_80_for_run(os.path.dirname(run_path(algo, s, "x")))
+                                                 for s in SEEDS if os.path.exists(run_path(algo, s, "summary.json"))])),
                      "finished_strong": round(np.mean([x["finished_strong_share"] for x in sums]), 3),
                      "unseen_reward": round(g["unseen_reward"].mean(), 2),
                      "unseen_std": round(g["unseen_reward"].std(ddof=0), 2),

@@ -11,6 +11,7 @@ import os
 import time
 
 import numpy as np
+import pandas as pd
 import torch
 from torch import nn
 from torchrl.envs import Compose, GymWrapper, RewardSum, StepCounter, TransformedEnv
@@ -98,12 +99,14 @@ def evaluate_net(net: nn.Module, seeds, scenario: str = "standard",
     return rows
 
 
-def steps_to_threshold(steps, values, frac: float = 0.8):
+def steps_to_threshold(steps, values, frac: float = 0.8, smooth: int = 3):
     """First step where the curve reaches frac of the way from its start to its
-    best value AND stays there for the rest of training ("reach and hold")."""
+    best value AND stays there for the rest of training ("reach and hold").
+    The validation curve (10 seeds) is noisy, so it is first smoothed with a
+    rolling mean over `smooth` checks."""
     if len(values) == 0:
         return None
-    v = np.asarray(values, dtype=float)
+    v = pd.Series(np.asarray(values, dtype=float)).rolling(smooth, min_periods=1).mean().to_numpy()
     start, best = v[0], v.max()
     if best <= start:
         return int(steps[0])
@@ -175,6 +178,12 @@ def load_policy(path: str) -> nn.Module:
     net.eval()
     net.stochastic = ckpt.get("stochastic", ckpt["algo"] != "dqn")
     return net
+
+
+def steps_to_80_for_run(run_dir: str):
+    """Recompute steps-to-80% from a run's logged validation curve."""
+    v = pd.read_csv(os.path.join(run_dir, "validation.csv"))
+    return steps_to_threshold(v["step"].tolist(), v["mean_reward"].tolist())
 
 
 def summarise_eval(rows: list[dict]) -> dict:
