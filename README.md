@@ -67,7 +67,9 @@ controls.
 
 Options: `--algo {best,dqn,reinforce,ppo,a2c,rule,random}`, `--seed`, `--delay`
 (seconds per term), `--scenario {standard,hard}`, `--episodes`, `--gif <path>`,
-`--view3d`, `--no-window`, `--no-hold`. Every episode is saved as JSON in `logs/episodes/`.
+`--view3d`, `--no-window`, `--no-hold`, `--scale <share of screen width>` (for example
+`--scale 0.62` pins a smaller window top-left so the terminal fits below it, which is how the
+demo video was recorded). Every episode is saved as JSON in `logs/episodes/`.
 
 ---
 

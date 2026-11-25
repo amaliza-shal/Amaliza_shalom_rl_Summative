@@ -106,10 +106,11 @@ def on_track(env) -> int:
 
 
 def play(algo="best", seed=0, delay=1.5, scenario="standard", window=True, gif=None,
-         episodes=1, log=True, view3d=False, hold=True):
+         episodes=1, log=True, view3d=False, hold=True, scale=None):
     name, act = make_actor(algo)
     render_mode = "human" if window else ("rgb_array" if gif else None)
     env = SchoolEnv(render_mode=render_mode, scenario=scenario)
+    env.window_scale = scale
     env.agent_label = name if name in ("rule-based", "random") else f"{name} agent"
     frames = []
     results = []
@@ -185,9 +186,13 @@ def main():
     p.add_argument("--view3d", action="store_true", help="open a three.js 3D replay in the browser")
     p.add_argument("--no-hold", action="store_true",
                    help="close the window by itself at the end instead of waiting for a key")
+    p.add_argument("--scale", type=float, default=None,
+                   help="window width as a share of the screen, e.g. 0.6, pinned top-left (for recording "
+                        "the GUI and the terminal together)")
     a = p.parse_args()
     play(a.algo, a.seed, a.delay if not a.no_window else 0.0, a.scenario,
-         window=not a.no_window, gif=a.gif, episodes=a.episodes, view3d=a.view3d, hold=not a.no_hold)
+         window=not a.no_window, gif=a.gif, episodes=a.episodes, view3d=a.view3d, hold=not a.no_hold,
+         scale=a.scale)
 
 
 if __name__ == "__main__":

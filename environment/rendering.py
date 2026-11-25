@@ -120,9 +120,12 @@ def _enable_dpi_awareness():
 
 
 class SchoolRenderer:
-    def __init__(self, render_mode: str = "human"):
+    def __init__(self, render_mode: str = "human", scale: float | None = None):
         if render_mode == "human":
             _enable_dpi_awareness()
+            if scale:  # a smaller window pinned top-left leaves room for the terminal below
+                import os
+                os.environ.setdefault("SDL_VIDEO_WINDOW_POS", "0,32")
         import pygame
 
         self.pg = pygame
@@ -132,7 +135,8 @@ class SchoolRenderer:
         self.canvas = pygame.Surface((W, H))
         if render_mode == "human":
             dw, dh = pygame.display.get_desktop_sizes()[0]
-            scale = min(1.0, 0.96 * dw / W, 0.86 * dh / H)  # leave room for title bar + taskbar
+            fit = min(1.0, 0.96 * dw / W, 0.86 * dh / H)  # leave room for title bar + taskbar
+            scale = min(fit, scale * dw / W) if scale else fit  # --scale = share of the screen width
             self.window = pygame.display.set_mode((int(W * scale), int(H * scale)), pygame.RESIZABLE)
             pygame.display.set_caption("School Director - Mission RL")
         self.clock = pygame.time.Clock()

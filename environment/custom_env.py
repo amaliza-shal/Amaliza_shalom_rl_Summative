@@ -305,7 +305,7 @@ class SchoolEnv(gym.Env):
             return None
         if self._renderer is None:
             from environment.rendering import SchoolRenderer
-            self._renderer = SchoolRenderer(self.render_mode)
+            self._renderer = SchoolRenderer(self.render_mode, getattr(self, "window_scale", None))
         return self._renderer.draw(self)
 
     def close(self):
