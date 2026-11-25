@@ -31,9 +31,10 @@ uv run main.py          # runs the best trained agent with the Pygame GUI
 No manual `pip install` and no manual virtual environment. `uv` installs Python 3.12
 automatically if needed.
 
-### Play any trained agent (`main.py` is the play script)
+### Play any trained agent (`main.py` is the play script; `play.py` does the same)
 
 ```bash
+uv run main.py --seed 4 --delay 6            # demo episode used in the report and video (PPO)
 uv run main.py --algo ppo                    # GUI + one line per term in the terminal
 uv run main.py --algo dqn --seed 7 --delay 3 # slower, another starting state
 uv run main.py --algo rule                   # rule-based baseline
@@ -42,15 +43,31 @@ uv run main.py --no-window                   # best agent, terminal only
 uv run main.py --algo dqn --view3d           # also open a three.js 3D replay in the browser
 ```
 
-**Two views of the same environment.** The Pygame window (`environment/rendering.py`)
-runs live while the agent plays. The 3D view (`environment/viewer3d.html`, three.js /
-WebGL) replays the saved episode JSON in the browser: a 3D school with one figure
-per teacher, the six children coloured green / yellow / red by how they are doing,
-dropouts walking away, a rotatable camera and play / pause / step controls.
+**The live GUI** (`environment/rendering.py`, Pygame) scales itself to fit the screen
+(Windows display scaling included) and shows, every term:
+
+- the director's decision, the reward for the term and the running total;
+- the school (one icon per teacher) and its six numbers with this term's change;
+- what happened this term (funding cuts, family shocks, missed classes) and how many
+  children are on track to finish strong;
+- one card per child: learning, attendance, confidence and home pressure with this
+  term's change, a tick at the finish-strong target, a status (on track / getting there /
+  needs help / at risk / dropped out) and a tag when the director helped that child;
+- an 18-term timeline of every decision and its reward.
+
+When the episode ends, a **6-year report card** shows each child's final result and why
+(for example "Confidence below 0.55"), how the director spent its terms, and the totals.
+It stays on screen until a key is pressed (`--no-hold` closes it automatically). The
+terminal prints one line per term and the same per-child summary at the end.
+
+**The 3D view** (`environment/viewer3d.html`, three.js / WebGL) replays the saved episode
+JSON in the browser: a 3D school with one figure per teacher, the six children coloured
+by how they are doing, dropouts walking away, a rotatable camera and play / pause / step
+controls.
 
 Options: `--algo {best,dqn,reinforce,ppo,a2c,rule,random}`, `--seed`, `--delay`
-(seconds per term), `--scenario {standard,hard}`, `--episodes`, `--gif <path>`.
-Every episode is saved as JSON in `logs/episodes/`.
+(seconds per term), `--scenario {standard,hard}`, `--episodes`, `--gif <path>`,
+`--view3d`, `--no-window`, `--no-hold`. Every episode is saved as JSON in `logs/episodes/`.
 
 ---
 
@@ -215,11 +232,12 @@ project_root/
 ├── uv.lock                 # exact locked versions
 ├── README.md
 ├── main.py                 # play any trained agent with the GUI (default: the best one)
+├── play.py                 # same as main.py
 │
 ├── environment/
 │   ├── __init__.py
 │   ├── custom_env.py       # SchoolEnv (Gymnasium API)
-│   ├── rendering.py        # Pygame view + three.js replay export
+│   ├── rendering.py        # Pygame GUI (children, timeline, report card) + three.js replay export
 │   └── viewer3d.html       # three.js (WebGL) 3D replay page
 │
 ├── training/
