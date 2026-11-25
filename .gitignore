@@ -14,3 +14,6 @@ Thumbs.db
 .pytest_cache/
 logs/*.txt
 logs/**/*.txt
+
+# Episodes saved by main.py when you play (not part of the submission)
+logs/episodes/
