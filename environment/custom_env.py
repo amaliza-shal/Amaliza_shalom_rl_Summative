@@ -227,6 +227,7 @@ class SchoolEnv(gym.Env):
         self.total_reward = 0.0
         self.events = []
         self.end_reason = None
+        self.term_log = []  # one entry per term, for the display and replays (not seen by the agent)
 
         if self.render_mode == "human":
             self.render()
@@ -293,6 +294,8 @@ class SchoolEnv(gym.Env):
 
         self.last_reward = float(reward)
         self.total_reward += float(reward)
+        self.term_log.append({"term": self.term, "action": action, "reward": float(reward),
+                              "events": list(self.events)})
         if self.render_mode == "human":
             self.render()
         return self._obs(), float(reward), terminated, False, self._info()
