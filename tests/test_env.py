@@ -133,3 +133,23 @@ def test_3d_replay_export(tmp_path):
     html = open(out, encoding="utf-8").read()
     assert "/*EPISODE_JSON*/null" not in html
     assert '"agent": "rule-based"' in html and "three@0.160.0" in html
+
+
+def test_gui_renders_every_term_and_report_card():
+    """The Pygame GUI draws a full episode off-screen (start, every term, report card),
+    the timeline has one entry per term, and values hidden by rounding show 3 decimals."""
+    from environment.rendering import H, W, fmt_value
+    env = SchoolEnv(render_mode="rgb_array")
+    env.reset(seed=4)
+    assert env.render().shape == (H, W, 3)
+    agent, done = RuleBasedAgent(), False
+    obs = env._obs()
+    while not done:
+        obs, _, term, trunc, _ = env.step(agent.act(obs, env))
+        frame = env.render()
+        done = term or trunc
+    assert frame.shape == (H, W, 3) and env.end_reason
+    assert len(env.term_log) == env.term
+    assert len(env._renderer.history) == env.term
+    env.close()
+    assert fmt_value(0.5458, 0.55) == "0.546" and fmt_value(0.7, 0.55) == "0.70"
