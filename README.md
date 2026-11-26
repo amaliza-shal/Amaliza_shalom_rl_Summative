@@ -1,4 +1,4 @@
-# School Director: Mission-Based Reinforcement Learning
+﻿# School Director: Mission-Based Reinforcement Learning
 
 **Mission:** quality education for children in underserved communities through qualified
 teachers, mentorship, family support and government backing.
@@ -84,6 +84,6 @@ Figures are in `assets/`, and the full report is in `report/`.
 ├── models/                   # dqn/, pg/ (best models)
 ├── logs/                     # sweep results, configs, training curves
 ├── assets/                   # figures and screenshots
-├── report/                   # summative report (PDF and Word)
+├── report/                   # summative report (PDF)
 └── tests/                    # uv run pytest -q
 ```
